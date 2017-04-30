@@ -1,12 +1,12 @@
 <?php
 /**
  * Publish box template
- * @since 0.1
+ * @since 0.1.0
  */
 
 /**
  * Filterable label text for checkbox.
- * @since 0.1
+ * @since 0.1.0
  */
 $label_text = $label_text = sprintf(
 	_x( 'Publish to <a href="%s">Micro.blog</a>', 'checkbox label', 'microblog' ),

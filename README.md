@@ -60,5 +60,5 @@ User capability required to add posts to the custom feed.
 
 ## Changelog
 
-### 0.1
+### 0.1.0
 * Initial fork from [DEWP Planet Feed](https://github.com/deworg/dewp-planet-feed)

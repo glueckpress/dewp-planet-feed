@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) or die( 'You know better.' );
 /**
  * Plugin Name:       Micro.blog
  * Description:       Generates a custom feed “microblog” for posts. Adds a checkbox to the Publish meta box in order to add a post to the custom feed.
- * Version:           0.1
+ * Version:           0.1.0
  * Author:            Caspar Hübinger
  * Author URI:        https://glueckpress.com/
  * Plugin URI:        https://github.com/glueckpress/micro.blog
@@ -26,7 +26,7 @@ defined( 'ABSPATH' ) or die( 'You know better.' );
 
 /**
  * Set marker for activation.
- * @since 0.1
+ * @since 0.1.0
  */
  register_activation_hook(
  	__FILE__,
@@ -35,7 +35,7 @@ defined( 'ABSPATH' ) or die( 'You know better.' );
 
 /**
  * Flush rewrite rules.
- * @since 0.1
+ * @since 0.1.0
  */
 register_deactivation_hook(
 	__FILE__,
@@ -46,14 +46,14 @@ class MicroBlog {
 
 	/**
 	 * Allowed post types.
-	 * @since 0.1
+	 * @since 0.1.0
 	 * @var array  Default: post
 	 */
 	public static $post_types;
 
 	/**
 	 * Required capability.
-	 * @since 0.1
+	 * @since 0.1.0
 	 * @var string  Default: publish_posts
 	 */
 	public static $capability;
@@ -74,7 +74,7 @@ class MicroBlog {
 
 		/**
 		* Filterable post types.
-		* @since 0.1
+		* @since 0.1.0
 		*/
 		self::$post_types = apply_filters(
 			'microblog_feed__post_types',
@@ -83,7 +83,7 @@ class MicroBlog {
 
 		/**
 		* Filterable capability to enable checkbox.
-		* @since 0.1
+		* @since 0.1.0
 		*/
 		self::$capability = apply_filters(
 			'microblog_feed__capability',
