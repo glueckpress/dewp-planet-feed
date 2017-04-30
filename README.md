@@ -14,7 +14,7 @@ Provides a custom RSS template to adjust feed output for Micro.blog.
 
 ```
 http://example.com/feed/microblog/
-http://example.com?feed=microblob
+http://example.com?feed=microblog
 ```
 
 ### Filters:
