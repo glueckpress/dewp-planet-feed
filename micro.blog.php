@@ -1,18 +1,17 @@
 <?php
 defined( 'ABSPATH' ) or die( 'You know better.' );
 /**
- * Plugin Name:       DEWP Planet Feed (Beta)
- * Description:       Generates a custom feed “dewp-planet” for posts. Adds a checkbox to the Publish meta box in order to explicitly add a post to that custom feed.
- * Version:           0.4-beta
- * Author:            dewp#planet team
- * Author URI:        https://dewp.slack.com/messages/planet/
- * Plugin URI:        https://github.com/deworg/dewp-planet-feed
- * GitHub Plugin URI: https://github.com/deworg/dewp-planet-feed
+ * Plugin Name:       Micro.blog
+ * Description:       Generates a custom feed “microblog” for posts. Adds a checkbox to the Publish meta box in order to add a post to the custom feed.
+ * Version:           0.1
+ * Author:            Caspar Hübinger
+ * Author URI:        https://glueckpress.com/
+ * Plugin URI:        https://github.com/glueckpress/micro.blog
+ * GitHub Plugin URI: https://github.com/glueckpress/micro.blog
  * License:           GNU General Public License v3
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
  *
- * Based upon DS_wpGrafie_WP_Planet_Feed class by Dominik Schilling (@ocean90).
- * https://github.com/ocean90/wpgrafie-theme/blob/master/classes/class-ds-wpgrafie-wp-planet-feed.php
+ * Based upon [DEWP Planet Feed](https://github.com/deworg/microblog-feed).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +30,7 @@ defined( 'ABSPATH' ) or die( 'You know better.' );
  */
  register_activation_hook(
  	__FILE__,
- 	array( 'DEWP_Planet_Feed', 'activation' )
+ 	array( 'MicroBlog', 'activation' )
  );
 
 /**
@@ -40,10 +39,10 @@ defined( 'ABSPATH' ) or die( 'You know better.' );
  */
 register_deactivation_hook(
 	__FILE__,
-	array( 'DEWP_Planet_Feed', 'deactivation' )
+	array( 'MicroBlog', 'deactivation' )
 );
 
-class DEWP_Planet_Feed {
+class MicroBlog {
 
 	/**
 	 * Allowed post types.
@@ -70,12 +69,15 @@ class DEWP_Planet_Feed {
 	 */
 	public function __construct() {
 
+
+		// @todo L10n!!
+
 		/**
 		* Filterable post types.
 		* @since 0.1
 		*/
 		self::$post_types = apply_filters(
-			'wp_planet_feed__post_types',
+			'microblog_feed__post_types',
 			array( 'post' )
 		);
 
@@ -84,11 +86,11 @@ class DEWP_Planet_Feed {
 		* @since 0.1
 		*/
 		self::$capability = apply_filters(
-			'wp_planet_feed__capability',
+			'microblog_feed__capability',
 			'publish_posts'
 		);
 
-		self::$maybe_activation = get_option( 'wp_planet_feed__activated', false );
+		self::$maybe_activation = get_option( 'microblog_feed__activated', false );
 
 		add_action( 'init', array( __CLASS__, 'init' ) );
 	}
@@ -99,7 +101,7 @@ class DEWP_Planet_Feed {
 	 * @return void
 	 */
 	public static function activation() {
-		update_option( 'wp_planet_feed__activated', 'activating' );
+		update_option( 'microblog_feed__activated', 'activating' );
 	}
 
 	/**
@@ -109,7 +111,7 @@ class DEWP_Planet_Feed {
 	 */
 	public static function deactivation() {
 		flush_rewrite_rules();
-		delete_option( 'wp_planet_feed__activated', 'deactivated' );
+		delete_option( 'microblog_feed__activated', 'deactivated' );
 	}
 
 	/**
@@ -120,11 +122,13 @@ class DEWP_Planet_Feed {
 	public static function init() {
 
 		// Add custom feed.
-		add_feed( 'dewp-planet', array( __CLASS__, 'feed_template' ) );
+		add_feed( 'microblog', array( __CLASS__, 'feed_template' ) );
+
 		if ( 'activating' === self::$maybe_activation ) {
+
 			// Not recommended, but it’s only once during activation.
 			flush_rewrite_rules();
-			update_option( 'wp_planet_feed__activated', 'activated' );
+			update_option( 'microblog_feed__activated', 'activated' );
 		}
 
 		// Publish post actions.
@@ -147,7 +151,8 @@ class DEWP_Planet_Feed {
 	 * @return void
 	 */
 	public static function feed_template() {
-		load_template( ABSPATH . WPINC . '/feed-rss2.php' );
+
+		load_template( trailingslashit( dirname( __FILE__ ) ) . 'templates/microblog-feed-rss2.php' );
 	}
 
 	/**
@@ -156,6 +161,7 @@ class DEWP_Planet_Feed {
 	 * @return void
 	 */
 	public static function add_checkbox() {
+
 		global $post;
 
 		// Bail if post type is not allowed.
@@ -167,7 +173,7 @@ class DEWP_Planet_Feed {
 		$maybe_enabled = current_user_can( self::$capability );
 
 		// This actually defines whether post will be listed in our feed.
-		$value = get_post_meta( $post->ID, '_wpf_show_in_dewp_planet_feed', true );
+		$value = get_post_meta( $post->ID, '_microblog_post_to_feed', true );
 
 		ob_start();
 		include trailingslashit( dirname( __FILE__ ) ) . 'inc/pub-section.php';
@@ -178,11 +184,12 @@ class DEWP_Planet_Feed {
 
 	/**
 	 * Register and enqueue admin scripts and styles.
-	 * @since  0.3
+	 * @since  0.1
 	 * @param  string $hook Current admin page
 	 * @return return       Current admin page
 	 */
 	public static function admin_enqueue_scripts( $hook ) {
+
 		if ( 'post.php' !== $hook && 'post-new.php' !== $hook )
 			return;
 
@@ -191,11 +198,11 @@ class DEWP_Planet_Feed {
 
 		// CSS
 		wp_register_style(
-			'dewp-planet-post', $assets_url . 'css/post.css',
+			'microblog-post', $assets_url . 'css/post.css',
 			array( 'wp-admin' ),
 			$file_data['v']
 		);
-		wp_enqueue_style( 'dewp-planet-post' );
+		wp_enqueue_style( 'microblog-post' );
 
 		return $hook;
 	}
@@ -223,10 +230,10 @@ class DEWP_Planet_Feed {
 		if ( ! current_user_can( self::$capability ) ) {
 			return $post_id;
 		}
-		if ( empty( $_POST['dewp-planet__add-to-feed'] ) ) {
-			delete_post_meta( $post_id, '_wpf_show_in_dewp_planet_feed' );
+		if ( empty( $_POST['microblog__post-to-feed'] ) ) {
+			delete_post_meta( $post_id, '_microblog_post_to_feed' );
 		} else {
-			add_post_meta( $post_id, '_wpf_show_in_dewp_planet_feed', 1, true );
+			add_post_meta( $post_id, '_microblog_post_to_feed', 1, true );
 		}
 
 		return $post_id;
@@ -248,16 +255,16 @@ class DEWP_Planet_Feed {
 		if ( $query->get( 'suppress_filters' ) ) {
 			return;
 		}
-		// Bail if this is not the Shire.
-		if ( ! $query->is_feed( 'dewp-planet' ) ) {
+		// Bail if this is not our microblog feed.
+		if ( ! $query->is_feed( 'microblog' ) ) {
 			return;
 		}
 		$query->set( 'post_type', self::$post_types );
-		$query->set( 'meta_key', '_wpf_show_in_dewp_planet_feed' );
+		$query->set( 'meta_key', '_microblog_post_to_feed' );
 
 		return $query;
 	}
 }
 
-// Hallo!
-new DEWP_Planet_Feed();
+// Hello!
+new MicroBlog();

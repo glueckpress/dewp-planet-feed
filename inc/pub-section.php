@@ -1,38 +1,37 @@
 <?php
 /**
  * Publish box template
- * @since 0.3
+ * @since 0.1
  */
-
- /**
-  * Filterable label text for checkbox. (Skipped i18n for now.)
-  * @since 0.3
-  */
- $label_text = apply_filters(
- 	'dewp_planet__pub_section_label',
-	'Im DEWP-Planet-Feed anzeigen'
-);
 
 /**
- * Filterable notice text for checkbox. (Skipped i18n for now.)
- * @since 0.3
+ * Filterable label text for checkbox.
+ * @since 0.1
  */
-$notice_text = apply_filters(
-	'dewp_planet__pub_section_notice',
-	'<span class="dashicons dashicons-warning" aria-hidden="true"></span><strong>Erscheint in allen deutschsprachigen WordPress-Dashboards!</strong>'
+$label_text = $label_text = sprintf(
+	_x( 'Publish to <a href="%s">Micro.blog</a>', 'checkbox label', 'microblog' ),
+	esc_url( 'https://micro.blog' ) // @todo user account URL
+);
+
+if ( 'publish' === $post->post_status && '1' === $value ) {
+	$label_text = sprintf(
+		_x( '<strong>Published on <a href="%s">Micro.blog</a></strong>', 'checkbox label', 'microblog' ),
+		esc_url( 'https://micro.blog' ) // @todo micro.blog permalink
+	);
+}
+
+$label_text = apply_filters(
+ 	'microblog__pub_section_label',
+	$label_text,
+	$post,
+	$value
 );
 ?>
-<div class="misc-pub-section dewp-planet">
-	<label for="dewp-planet__add-to-feed">
-		<input type="checkbox" id="dewp-planet__add-to-feed" name="dewp-planet__add-to-feed" class="dewp-planet__add-to-feed" <?php checked( $value ); disabled( $maybe_enabled, false ); ?> value="1" />
-		<span class="dewp-planet__label-text">
+<div class="misc-pub-section microblog">
+	<label for="microblog__post-to-feed">
+		<input type="checkbox" id="microblog__post-to-feed" name="microblog__post-to-feed" class="microblog__post-to-feed" <?php checked( $value ); disabled( $maybe_enabled, false ); ?> value="1" />
+		<span class="microblog__label-text">
 			<?php echo $label_text; ?>
-			<a href="https://github.com/deworg/dewp-planet-feed/blob/master/ABOUT.md" class="dewp-planet__help-link dashicons-before dashicons-editor-help hide-if-no-js" target="_blank">
-				<span class="screen-reader-text">Was ist das?</span>
-			</a>
-			<span class="dewp-planet__label-notice">
-				<?php echo $notice_text; ?>
-			</span>
 		</span>
 	</label>
 </div>
